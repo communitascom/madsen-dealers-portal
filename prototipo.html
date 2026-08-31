@@ -635,8 +635,8 @@ fromHash();
    funciona sem conta, sem chave e sem nada para manter no ar.
    ========================================================================== */
 (function(){
-  var KEY   = 'madsen-portal-comentarios-v1';
-  var WHO   = 'madsen-portal-revisor-v1';
+  var KEY   = 'madsen-portal-comments-v2';   // v2 starts everyone from a clean slate
+  var WHO   = 'madsen-portal-reviewer-v2';
   var MAILTO = 'communitas@communitas.com.br';
 
   // blocos que fazem sentido comentar, do maior para o menor
@@ -682,22 +682,22 @@ fromHash();
   var barra = document.createElement('div');
   barra.id = 'cmt-bar';
   barra.innerHTML =
-      '<span class="cmt-mock">Communitas mockup &middot; não é o portal no ar</span>'
-    + '<button type="button" id="cmt-toggle">Comentar</button>'
-    + '<button type="button" id="cmt-open">Comentários <b>0</b></button>';
+      '<span class="cmt-mock">Communitas mockup &middot; not the live portal</span>'
+    + '<button type="button" id="cmt-toggle">Comment</button>'
+    + '<button type="button" id="cmt-open">Comments <b>0</b></button>';
   document.body.appendChild(barra);
 
   var painel = document.createElement('aside');
   painel.id = 'cmt-panel';
   painel.hidden = true;
   painel.innerHTML =
-      '<header><b>Comentários</b><button type="button" id="cmt-close" aria-label="Fechar">&times;</button></header>'
+      '<header><b>Comments</b><button type="button" id="cmt-close" aria-label="Close">&times;</button></header>'
     + '<div id="cmt-list"></div>'
     + '<footer>'
-    + '  <button type="button" id="cmt-copy">Copiar tudo</button>'
-    + '  <button type="button" id="cmt-file">Baixar</button>'
-    + '  <button type="button" id="cmt-mail">Enviar por e-mail</button>'
-    + '  <p id="cmt-hint">Os comentários ficam neste navegador. Use um dos três para mandar para a Communitas.</p>'
+    + '  <button type="button" id="cmt-copy">Copy all</button>'
+    + '  <button type="button" id="cmt-file">Download</button>'
+    + '  <button type="button" id="cmt-mail">Email to Communitas</button>'
+    + '  <p id="cmt-hint">Comments stay in this browser. Use one of the three to send them to Communitas.</p>'
     + '</footer>';
   document.body.appendChild(painel);
 
@@ -706,9 +706,9 @@ fromHash();
   comp.hidden = true;
   comp.innerHTML =
       '<p class="cmt-alvo"></p>'
-    + '<textarea rows="4" placeholder="O que muda aqui?"></textarea>'
-    + '<div class="cmt-acoes"><button type="button" class="cmt-cancel">Cancelar</button>'
-    + '<button type="button" class="cmt-save">Salvar</button></div>';
+    + '<textarea rows="4" placeholder="What should change here?"></textarea>'
+    + '<div class="cmt-acoes"><button type="button" class="cmt-cancel">Cancel</button>'
+    + '<button type="button" class="cmt-save">Save</button></div>';
   document.body.appendChild(comp);
 
   /* ---------------------------------------------------------------- pinos */
@@ -730,8 +730,8 @@ fromHash();
   function lista(){
     var host = document.getElementById('cmt-list');
     if (!comentarios.length){
-      host.innerHTML = '<p class="cmt-vazio">Nenhum comentário ainda. Clique em <b>Comentar</b> '
-                     + 'e depois em qualquer parte da página.</p>';
+      host.innerHTML = '<p class="cmt-vazio">No comments yet. Click <b>Comment</b>, '
+                     + 'then click anything on the page.</p>';
       return;
     }
     var porPag = {};
@@ -743,7 +743,7 @@ fromHash();
                  + '<span class="cmt-n">' + (i+1) + '</span>'
                  + '<span class="cmt-txt"><i>' + esc(c.trecho) + '</i>'
                  + '<span>' + esc(c.nota) + '</span></span>'
-                 + '<button type="button" class="cmt-del" aria-label="Apagar">&times;</button></div>';
+                 + '<button type="button" class="cmt-del" aria-label="Delete">&times;</button></div>';
           }).join('')
         + '</div>';
     }).join('');
@@ -756,7 +756,7 @@ fromHash();
   function setModo(on){
     modo = on;
     document.body.classList.toggle('cmt-on', on);
-    barra.querySelector('#cmt-toggle').textContent = on ? 'Sair do modo comentário' : 'Comentar';
+    barra.querySelector('#cmt-toggle').textContent = on ? 'Exit comment mode' : 'Comment';
     barra.querySelector('#cmt-toggle').setAttribute('aria-pressed', String(on));
     if (!on) fecharComp();
   }
@@ -801,7 +801,7 @@ fromHash();
     var nota = comp.querySelector('textarea').value.trim();
     if (!nota || !alvoAtual) return fecharComp();
     if (!revisor){
-      revisor = (prompt('Seu nome, para a Communitas saber de quem é o comentário:') || '').trim();
+      revisor = (prompt('Your name, so Communitas knows who left the comment:') || '').trim();
       try { localStorage.setItem(WHO, revisor); } catch(e){}
     }
     comentarios.push({
@@ -845,12 +845,12 @@ fromHash();
 
   /* ---------------------------------------------------------------- saída */
   function texto(){
-    if (!comentarios.length) return 'Nenhum comentário.';
+    if (!comentarios.length) return 'No comments.';
     var porPag = {};
     comentarios.forEach(function(c){ (porPag[c.pagina] = porPag[c.pagina] || []).push(c); });
-    var out = ['MPSI Dealers Portal | comentários de revisão',
-               'Revisor: ' + (revisor || 'não informado'),
-               'Protótipo: ' + location.href.split('#')[0], ''];
+    var out = ['MPSI Dealers Portal | review comments',
+               'Reviewer: ' + (revisor || 'not given'),
+               'Prototype: ' + location.href.split('#')[0], ''];
     Object.keys(porPag).forEach(function(pag){
       out.push('## ' + pag, '');
       porPag[pag].forEach(function(c, i){
@@ -863,11 +863,11 @@ fromHash();
 
   document.getElementById('cmt-copy').addEventListener('click', function(){
     var t = texto();
-    navigator.clipboard.writeText(t).then(function(){ aviso('Copiado. Cole no e-mail ou no WhatsApp.'); },
+    navigator.clipboard.writeText(t).then(function(){ aviso('Copied. Paste it into an email or a message.'); },
       function(){
         var ta = document.createElement('textarea');
         ta.value = t; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); aviso('Copiado.'); } catch(e){ aviso('Não deu para copiar. Use Baixar.'); }
+        try { document.execCommand('copy'); aviso('Copied.'); } catch(e){ aviso('Could not copy. Use Download instead.'); }
         ta.remove();
       });
   });
@@ -875,15 +875,15 @@ fromHash();
     var b = new Blob([texto()], {type:'text/plain;charset=utf-8'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(b);
-    a.download = 'comentarios-dealers-portal.txt';
+    a.download = 'dealers-portal-comments.txt';
     document.body.appendChild(a); a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
   });
   document.getElementById('cmt-mail').addEventListener('click', function(){
     var corpo = texto();
-    if (corpo.length > 1600) corpo = corpo.slice(0, 1600) + '\n\n[...] use Copiar tudo, a lista é longa.';
+    if (corpo.length > 1600) corpo = corpo.slice(0, 1600) + '\n\n[...] the list is long, use Copy all instead.';
     location.href = 'mailto:' + MAILTO
-      + '?subject=' + encodeURIComponent('Dealers Portal | comentários de revisão')
+      + '?subject=' + encodeURIComponent('Dealers Portal | review comments')
       + '&body=' + encodeURIComponent(corpo);
   });
 
