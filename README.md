@@ -5,7 +5,8 @@ Page layouts for the Madsen Power Systems dealer portal, produced by Communitas.
 Everything here is built from out-of-the-box SharePoint web parts and section
 settings. No custom code, no SPFx.
 
-- `prototipo.html` | clickable prototype, twelve pages with working navigation
+- `prototipo.html` | clickable prototype, version 4 (after the 22 September review)
+- `prototipo-v3.html` | previous prototype, kept for reference
 - `painel.html` | the same pages with build notes and web part annotations
 - `index.html` | landing page
 
